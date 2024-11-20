@@ -1,14 +1,15 @@
 from django.shortcuts import render
-from .forms import UserForm
-from django.http import HttpResponse
+from .models import Person
+from django.http import HttpResponseRedirect, HttpResponseNotFound
 
 def index(request):
-    userform = UserForm()
-    if request.method == 'POST':
-        userform = UserForm(request.POST)
-        if userform.is_valid():
-            name = userform.cleaned_data['name']
-            return HttpResponse(f'<h2>Hello, {name}</h2>')
-        else:
-            return render(request, 'index.html', {'form': userform})
+    people = Person.objects.all()
+    return render(request, 'index.html', {'people': people})
 
+def create(request):
+    if request.method == 'POST':
+        person = Person()
+        person.name = request.POST.get('name')
+        person.age = request.POST.get('age')
+        person.save()
+    return HttpResponseRedirect('/')
